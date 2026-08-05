@@ -127,7 +127,7 @@ export default function NotificationsPage() {
           </button>
         </div>
         <p className="text-xs" style={{ color: 'var(--text-muted)' }}>
-          Configure SMTP in backend `.env` (`SMTP_ENABLED=true`) to receive revision emails with practice questions.
+          Revision emails with practice questions will be sent to this address automatically.
         </p>
       </div>
 
