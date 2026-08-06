@@ -7,6 +7,8 @@ import api from '@/lib/api';
 import { Bell, CheckCircle2, Loader2, Mail } from 'lucide-react';
 import Link from 'next/link';
 
+import { formatDateTime } from '@/lib/date';
+
 export default function NotificationsPage() {
   const queryClient = useQueryClient();
   const [emailInput, setEmailInput] = useState('');
@@ -161,7 +163,7 @@ export default function NotificationsPage() {
                       {!n.is_read && <span className="w-2 h-2 rounded-full" style={{ background: 'var(--primary)' }} />}
                     </div>
                     <p className="mt-1 text-sm" style={{ color: 'var(--text-secondary)' }}>{n.message}</p>
-                    <p className="text-xs mt-2" style={{ color: 'var(--text-muted)' }}>{new Date(n.created_at).toLocaleString()}</p>
+                    <p className="text-xs mt-2" style={{ color: 'var(--text-muted)' }}>{formatDateTime(n.created_at)}</p>
                     {n.related_note_id && (
                       <Link href={`/notes/${n.related_note_id}`} className="inline-block mt-2 text-sm font-semibold" style={{ color: 'var(--primary)' }}>
                         View note →

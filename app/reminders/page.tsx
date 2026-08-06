@@ -7,6 +7,7 @@ import { Clock, CheckCircle2, Trash2, Loader2, FileText, MessageSquare, ChevronD
 import Link from 'next/link';
 import { REVISION_DAYS } from '@/lib/constants';
 import { useState } from 'react';
+import { formatDate, formatDateTime } from '@/lib/date';
 
 export default function RemindersPage() {
   const queryClient = useQueryClient();
@@ -161,7 +162,7 @@ export default function RemindersPage() {
                             ? 'All revisions done'
                             : isOverdue
                             ? 'Overdue'
-                            : `Due: ${new Date(reminder.next_review_at).toLocaleDateString()}`}
+                            : `Due: ${formatDate(reminder.next_review_at)}`}
                         </span>
 
                         {/* Revision count pill */}
@@ -242,7 +243,7 @@ export default function RemindersPage() {
                           </p>
                           {reminder.answer_submitted_at && (
                             <p className="text-xs mt-1" style={{ color: '#6b7280' }}>
-                              Submitted {new Date(reminder.answer_submitted_at).toLocaleString()}
+                              Submitted {formatDateTime(reminder.answer_submitted_at)}
                             </p>
                           )}
                         </div>
