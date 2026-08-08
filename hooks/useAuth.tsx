@@ -38,11 +38,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+
+    // Safety net: never stay in loading state longer than 20 seconds
+    const safetyTimer = setTimeout(() => setIsLoading(false), 20000);
+
     if (token) {
-      fetchUser().finally(() => setIsLoading(false));
+      fetchUser().finally(() => {
+        clearTimeout(safetyTimer);
+        setIsLoading(false);
+      });
     } else {
+      clearTimeout(safetyTimer);
       setIsLoading(false);
     }
+
+    return () => clearTimeout(safetyTimer);
   }, [fetchUser]);
 
   // Redirect unauthenticated users away from protected routes

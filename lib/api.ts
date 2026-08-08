@@ -2,6 +2,7 @@ import axios from 'axios';
 
 const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000/api',
+  timeout: 15000, // 15 seconds — handles Render free-tier cold starts
 });
 
 // Add a request interceptor to include the auth token
