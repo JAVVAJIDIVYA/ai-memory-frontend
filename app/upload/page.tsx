@@ -27,6 +27,7 @@ export default function UploadPage() {
   const uploadMutation = useMutation({
     mutationFn: () => {
       if (mode === 'url') return notesService.uploadUrl(url, subject || undefined, topic || undefined);
+      if (mode === 'voice') return notesService.uploadVoice(file!, subject || undefined, topic || undefined);
       return notesService.uploadFile(file!, subject || undefined, topic || undefined);
     },
     onSuccess: () => {

@@ -37,6 +37,21 @@ export const notesService = {
     return response.data;
   },
 
+  uploadVoice: async (
+    file: File,
+    subject?: string,
+    topic?: string,
+  ): Promise<{ id: number; title: string; message: string }> => {
+    const formData = new FormData();
+    formData.append('file', file);
+    if (subject) formData.append('subject', subject);
+    if (topic) formData.append('topic', topic);
+    const response = await api.post('/upload/voice', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+    return response.data;
+  },
+
   uploadUrl: async (
     url: string,
     subject?: string,
