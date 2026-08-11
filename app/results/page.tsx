@@ -28,7 +28,7 @@ interface ResultItem {
   status: string;
 }
 
-type FilterType = 'all' | 'correct' | 'wrong' | 'unknown' | 'email' | 'web';
+type FilterType = 'all' | 'correct' | 'wrong';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000/api';
 
@@ -56,17 +56,12 @@ export default function ResultsPage() {
   const total = results.length;
   const correct = results.filter(r => r.is_correct === true).length;
   const wrong = results.filter(r => r.is_correct === false).length;
-  const viaEmail = results.filter(r => r.answer_source === 'email').length;
-  const viaWeb = results.filter(r => r.answer_source === 'web').length;
   const accuracy = total > 0 ? Math.round((correct / total) * 100) : 0;
 
   // Filtered list
   const filtered = results.filter(r => {
     if (filter === 'correct') return r.is_correct === true;
     if (filter === 'wrong') return r.is_correct === false;
-    if (filter === 'unknown') return r.is_correct === null;
-    if (filter === 'email') return r.answer_source === 'email';
-    if (filter === 'web') return r.answer_source === 'web';
     return true;
   });
 
@@ -74,8 +69,6 @@ export default function ResultsPage() {
     { key: 'all', label: 'All', count: total, color: '#6366f1' },
     { key: 'correct', label: '✓ Correct', count: correct, color: '#16a34a' },
     { key: 'wrong', label: '✗ Wrong', count: wrong, color: '#dc2626' },
-    { key: 'email', label: '📧 Via Email', count: viaEmail, color: '#0891b2' },
-    { key: 'web', label: '🖥️ Via Web', count: viaWeb, color: '#7c3aed' },
   ];
 
   return (
@@ -99,7 +92,7 @@ export default function ResultsPage() {
             <BarChart2 className="w-8 h-8" /> My Results
           </h2>
           <p className="text-indigo-100 mt-2">
-            Review all your answered questions — web &amp; email replies in one place.
+            Review all your answered revision questions.
           </p>
         </div>
         <div className="absolute -top-10 -right-10 w-48 h-48 rounded-full opacity-20"
@@ -120,8 +113,8 @@ export default function ResultsPage() {
               bg: accuracy >= 70 ? '#f0fdf4' : accuracy >= 40 ? '#fffbeb' : '#fef2f2',
               border: accuracy >= 70 ? '#bbf7d0' : accuracy >= 40 ? '#fde68a' : '#fecaca',
             },
-            { label: '📧 Via Email', value: viaEmail, color: '#0891b2', bg: '#ecfeff', border: '#a5f3fc' },
-            { label: '🖥️ Via Web', value: viaWeb, color: '#7c3aed', bg: '#f5f3ff', border: '#ddd6fe' },
+            { label: 'Correct Answers', value: correct, color: '#16a34a', bg: '#f0fdf4', border: '#bbf7d0' },
+            { label: 'Wrong Answers', value: wrong, color: '#dc2626', bg: '#fef2f2', border: '#fecaca' },
           ].map(s => (
             <div key={s.label}
               className="rounded-2xl p-5 text-center"
@@ -133,6 +126,7 @@ export default function ResultsPage() {
           ))}
         </div>
       )}
+
 
       {/* Accuracy Bar */}
       {total > 0 && (
@@ -250,23 +244,6 @@ export default function ResultsPage() {
                       <h3 className="font-bold text-base line-clamp-1" style={{ color: 'var(--text-primary)' }}>
                         {r.note_title}
                       </h3>
-                      {/* Source badge */}
-                      <span
-                        className="text-[10px] px-2 py-0.5 rounded-full font-bold uppercase flex-shrink-0 flex items-center gap-1"
-                        style={
-                          r.answer_source === 'email'
-                            ? { background: '#e0f2fe', color: '#0369a1', border: '1px solid #bae6fd' }
-                            : r.answer_source === 'web'
-                            ? { background: '#ede9fe', color: '#6d28d9', border: '1px solid #ddd6fe' }
-                            : { background: '#f1f5f9', color: '#64748b', border: '1px solid #e2e8f0' }
-                        }
-                      >
-                        {r.answer_source === 'email'
-                          ? <><Mail className="w-2.5 h-2.5" /> Email</>
-                          : r.answer_source === 'web'
-                          ? <><Monitor className="w-2.5 h-2.5" /> Web</>
-                          : 'Unknown'}
-                      </span>
                       {/* Result badge */}
                       <span
                         className="text-[10px] px-2 py-0.5 rounded-full font-bold uppercase"
@@ -278,6 +255,7 @@ export default function ResultsPage() {
                         {statusLabel}
                       </span>
                     </div>
+
 
                     <div className="flex items-center gap-3 mt-1 flex-wrap">
                       {r.note_subject && (
