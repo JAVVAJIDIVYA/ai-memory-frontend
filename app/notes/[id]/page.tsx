@@ -366,28 +366,68 @@ export default function NotePage() {
           <button
             onClick={() => scheduleReminderMutation.mutate({ minutes: 1 })}
             disabled={scheduleReminderMutation.isPending}
-            className="flex items-center gap-2 px-4 py-3 rounded-xl font-bold transition-all disabled:opacity-50 text-white text-sm"
+            className="flex items-center gap-2 px-3.5 py-2.5 rounded-xl font-bold transition-all disabled:opacity-50 text-white text-xs"
             style={{ background: 'linear-gradient(135deg, #f59e0b, #d97706)', boxShadow: '0 4px 12px rgba(245,158,11,0.3)' }}
           >
-            {scheduleReminderMutation.isPending ? <Loader2 className="w-5 h-5 animate-spin" /> : <Clock className="w-5 h-5" />}
-            Schedule in 1 Minute
+            {scheduleReminderMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Clock className="w-4 h-4" />}
+            1 Min (Test)
+          </button>
+          <button
+            onClick={() => scheduleReminderMutation.mutate({ minutes: 5 })}
+            disabled={scheduleReminderMutation.isPending}
+            className="flex items-center gap-2 px-3.5 py-2.5 rounded-xl font-bold border transition-all disabled:opacity-50 text-xs"
+            style={{ background: '#fff', borderColor: '#fed7aa', color: '#92400e' }}
+          >
+            5 Mins
           </button>
           <button
             onClick={() => scheduleReminderMutation.mutate({ hours: 1 })}
             disabled={scheduleReminderMutation.isPending}
-            className="flex items-center gap-2 px-4 py-3 rounded-xl font-bold border transition-all disabled:opacity-50 text-sm"
+            className="flex items-center gap-2 px-3.5 py-2.5 rounded-xl font-bold border transition-all disabled:opacity-50 text-xs"
             style={{ background: '#fff', borderColor: '#fed7aa', color: '#92400e' }}
           >
-            Schedule in 1 Hour
+            1 Hour
+          </button>
+          <button
+            onClick={() => scheduleReminderMutation.mutate({ hours: 24 })}
+            disabled={scheduleReminderMutation.isPending}
+            className="flex items-center gap-2 px-3.5 py-2.5 rounded-xl font-bold border transition-all disabled:opacity-50 text-xs"
+            style={{ background: '#fff', borderColor: '#fed7aa', color: '#92400e' }}
+          >
+            1 Day
+          </button>
+          <button
+            onClick={() => scheduleReminderMutation.mutate({ hours: 48 })}
+            disabled={scheduleReminderMutation.isPending}
+            className="flex items-center gap-2 px-3.5 py-2.5 rounded-xl font-bold border transition-all disabled:opacity-50 text-xs"
+            style={{ background: '#fff', borderColor: '#fed7aa', color: '#92400e' }}
+          >
+            2 Days
+          </button>
+          <button
+            onClick={() => scheduleReminderMutation.mutate({ hours: 96 })}
+            disabled={scheduleReminderMutation.isPending}
+            className="flex items-center gap-2 px-3.5 py-2.5 rounded-xl font-bold border transition-all disabled:opacity-50 text-xs"
+            style={{ background: '#fff', borderColor: '#fed7aa', color: '#92400e' }}
+          >
+            4 Days
+          </button>
+          <button
+            onClick={() => scheduleReminderMutation.mutate({ hours: 168 })}
+            disabled={scheduleReminderMutation.isPending}
+            className="flex items-center gap-2 px-3.5 py-2.5 rounded-xl font-bold border transition-all disabled:opacity-50 text-xs"
+            style={{ background: '#fff', borderColor: '#fed7aa', color: '#92400e' }}
+          >
+            7 Days
           </button>
           {noteReminder && (
             <button
               onClick={() => completeReminderMutation.mutate(noteReminder.id)}
               disabled={completeReminderMutation.isPending}
-              className="flex items-center gap-2 px-4 py-3 rounded-xl font-bold transition-all disabled:opacity-50 text-white text-sm"
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold transition-all disabled:opacity-50 text-white text-xs"
               style={{ background: 'linear-gradient(135deg, #10b981, #059669)', boxShadow: '0 4px 12px rgba(16,185,129,0.3)' }}
             >
-              <CheckCircle2 className="w-5 h-5" />
+              <CheckCircle2 className="w-4 h-4" />
               Mark Done
             </button>
           )}
