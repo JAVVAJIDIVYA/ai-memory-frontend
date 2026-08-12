@@ -295,11 +295,13 @@ function PieChartView({ entries, totalUploads }: { entries: [string, number][]; 
   let cumAngle = -Math.PI / 2;
   const slices = entries.map(([type, count]) => {
     const cfg = getConfig(type);
-    const angle = (count / totalUploads) * 2 * Math.PI;
+    const rawAngle = (count / totalUploads) * 2 * Math.PI;
+    const angle = rawAngle >= 2 * Math.PI ? 2 * Math.PI - 0.0001 : rawAngle;
     const startAngle = cumAngle;
     cumAngle += angle;
     const endAngle = cumAngle;
     const midAngle = (startAngle + endAngle) / 2;
+
 
     const x1 = CX + R * Math.cos(startAngle);
     const y1 = CY + R * Math.sin(startAngle);

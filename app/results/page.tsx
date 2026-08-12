@@ -276,7 +276,7 @@ export default function ResultsPage() {
                     {/* Answer preview */}
                     {r.user_answer && (
                       <p className="text-sm mt-2 font-medium italic line-clamp-1" style={{ color: statusColor }}>
-                        "{r.user_answer}"
+                        "{r.user_answer === 'Self-reviewed material' || r.user_answer === 'Completed revision' ? 'Self-reviewed material' : r.user_answer}"
                       </p>
                     )}
                   </div>
@@ -355,7 +355,7 @@ export default function ResultsPage() {
                         </p>
                         <p className="text-sm font-semibold"
                           style={{ color: r.is_correct === true ? '#14532d' : r.is_correct === false ? '#991b1b' : 'var(--text-primary)' }}>
-                          {r.user_answer || '—'}
+                          {r.user_answer === 'Self-reviewed material' || r.user_answer === 'Completed revision' ? 'Self-reviewed material' : (r.user_answer || '—')}
                         </p>
                       </div>
 
