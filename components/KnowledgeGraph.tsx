@@ -142,7 +142,6 @@ export default function KnowledgeGraph({ data, onSelectNote }: KnowledgeGraphPro
 
     // Build d3 force simulation
     const simulation = d3.forceSimulation<GraphNode>(nodes)
-      .alphaDecay(0.08)
       .force('link', d3.forceLink<GraphNode, GraphLink>(links)
         .id(d => d.id)
         .distance(d => (d.dashed ? 110 : d.source === 'root' ? 130 : 75))
@@ -151,8 +150,9 @@ export default function KnowledgeGraph({ data, onSelectNote }: KnowledgeGraphPro
       .force('collide', d3.forceCollide<GraphNode>().radius(d => d.val + 16))
       .force('center', d3.forceCenter(0, 0));
 
-    // Pre-warm 250 ticks so graph loads in a 100% settled, stationary state
-    simulation.tick(250);
+    // Pre-calculate and FREEZE all node positions completely (zero background movement)
+    simulation.tick(300);
+    simulation.stop();
 
     let animId: number;
     let pulseTime = 0;
@@ -253,7 +253,7 @@ export default function KnowledgeGraph({ data, onSelectNote }: KnowledgeGraphPro
         ctx.lineWidth = node.type === 'root' ? 3 : 1.5;
         ctx.stroke();
 
-        // Node Icon or Type Indicator
+        // Node Icon
         if (node.type === 'root') {
           ctx.fillStyle = '#ffffff';
           ctx.font = 'bold 16px Inter, sans-serif';
@@ -274,15 +274,42 @@ export default function KnowledgeGraph({ data, onSelectNote }: KnowledgeGraphPro
           ctx.fillText('📌', node.x, node.y);
         }
 
-        // Node Label below node
+        // Node Label below node (Bright crisp text with dark backdrop pill)
         ctx.font = node.type === 'root' ? 'bold 13px Inter, sans-serif' : '600 11px Inter, sans-serif';
-        ctx.fillStyle = isMatch ? (node.type === 'root' ? '#4f46e5' : '#1e293b') : '#94a3b8';
+
+        let labelColor = '#ffffff';
+        if (!isMatch) {
+          labelColor = '#64748b';
+        } else if (node.type === 'root') {
+          labelColor = '#a5b4fc';
+        } else if (node.type === 'subject') {
+          labelColor = '#c7d2fe';
+        } else if (node.type === 'topic') {
+          labelColor = '#f472b6';
+        } else if (node.type === 'question') {
+          labelColor = '#67e8f9';
+        } else {
+          labelColor = '#ffffff';
+        }
+
+        const displayLabel = node.label.length > 24 ? node.label.slice(0, 22) + '…' : node.label;
+        const textWidth = ctx.measureText(displayLabel).width;
+        const labelY = node.y + radius + 5;
+
+        // Dark background pill for ultra legibility
+        ctx.fillStyle = 'rgba(15, 23, 42, 0.75)';
+        ctx.beginPath();
+        if (ctx.roundRect) {
+          ctx.roundRect(node.x - textWidth / 2 - 5, labelY - 1, textWidth + 10, 16, 4);
+        } else {
+          ctx.rect(node.x - textWidth / 2 - 5, labelY - 1, textWidth + 10, 16);
+        }
+        ctx.fill();
+
+        ctx.fillStyle = labelColor;
         ctx.textAlign = 'center';
         ctx.textBaseline = 'top';
-
-        // Truncate label for canvas text
-        const displayLabel = node.label.length > 22 ? node.label.slice(0, 20) + '…' : node.label;
-        ctx.fillText(displayLabel, node.x, node.y + radius + 5);
+        ctx.fillText(displayLabel, node.x, labelY);
 
         ctx.restore();
       });
@@ -293,7 +320,7 @@ export default function KnowledgeGraph({ data, onSelectNote }: KnowledgeGraphPro
 
     animId = requestAnimationFrame(render);
 
-    // ── Mouse & Drag Handlers ────────────────────────────────────────────────
+    // ── Mouse & Drag Handlers (Static — No simulation restart) ───────────────
     const getCanvasPos = (e: MouseEvent) => {
       const rect = canvas.getBoundingClientRect();
       const screenX = e.clientX - rect.left;
@@ -320,9 +347,8 @@ export default function KnowledgeGraph({ data, onSelectNote }: KnowledgeGraphPro
       if (hitNode) {
         isDraggingNodeRef.current = true;
         draggedNodeRef.current = hitNode;
-        hitNode.fx = hitNode.x;
-        hitNode.fy = hitNode.y;
-        simulation.alphaTarget(0.3).restart();
+        hitNode.x = worldX;
+        hitNode.y = worldY;
       } else {
         isDraggingCanvasRef.current = true;
         dragStartRef.current = { x: screenX - transformRef.current.x, y: screenY - transformRef.current.y };
@@ -333,8 +359,8 @@ export default function KnowledgeGraph({ data, onSelectNote }: KnowledgeGraphPro
       const { screenX, screenY, worldX, worldY } = getCanvasPos(e);
 
       if (isDraggingNodeRef.current && draggedNodeRef.current) {
-        draggedNodeRef.current.fx = worldX;
-        draggedNodeRef.current.fy = worldY;
+        draggedNodeRef.current.x = worldX;
+        draggedNodeRef.current.y = worldY;
       } else if (isDraggingCanvasRef.current) {
         transformRef.current.x = screenX - dragStartRef.current.x;
         transformRef.current.y = screenY - dragStartRef.current.y;
@@ -347,12 +373,8 @@ export default function KnowledgeGraph({ data, onSelectNote }: KnowledgeGraphPro
 
     const onMouseUp = () => {
       if (isDraggingNodeRef.current && draggedNodeRef.current) {
-        // Keep node pinned at its dropped position to prevent bouncing
-        draggedNodeRef.current.fx = draggedNodeRef.current.x;
-        draggedNodeRef.current.fy = draggedNodeRef.current.y;
         draggedNodeRef.current = null;
         isDraggingNodeRef.current = false;
-        simulation.alphaTarget(0);
       }
       isDraggingCanvasRef.current = false;
     };
