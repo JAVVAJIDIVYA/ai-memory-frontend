@@ -3,7 +3,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { notesService } from '@/services/notes';
 import { notificationsService } from '@/services/notifications';
-import { FileText, Clock, Bell, HelpCircle } from 'lucide-react';
+import { FileText, Clock, Bell, HelpCircle, Network } from 'lucide-react';
 import Link from 'next/link';
 import api from '@/lib/api';
 import { REVISION_DAYS } from '@/lib/constants';
@@ -79,7 +79,7 @@ export default function DashboardPage() {
     <div className="space-y-8">
       {/* Welcome Header */}
       <div
-        className="rounded-2xl p-8 relative overflow-hidden"
+        className="rounded-2xl p-8 relative overflow-hidden flex flex-col md:flex-row items-start md:items-center justify-between gap-4"
         style={{
           background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a78bfa 100%)',
           boxShadow: '0 8px 32px rgba(99,102,241,0.3)',
@@ -91,6 +91,21 @@ export default function DashboardPage() {
             Your study materials, summaries, and revision schedule — all in one place.
           </p>
         </div>
+        <Link
+          href="/graph"
+          className="relative z-10 flex items-center gap-2 px-5 py-3 rounded-xl font-bold text-sm transition-all"
+          style={{
+            background: 'rgba(255, 255, 255, 0.2)',
+            color: '#ffffff',
+            border: '1px solid rgba(255, 255, 255, 0.35)',
+            backdropFilter: 'blur(8px)',
+          }}
+          onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = 'rgba(255, 255, 255, 0.3)'; }}
+          onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = 'rgba(255, 255, 255, 0.2)'; }}
+        >
+          <Network className="w-4.5 h-4.5" />
+          Interactive Knowledge Graph →
+        </Link>
         {/* Decorative circles */}
         <div
           className="absolute -top-10 -right-10 w-48 h-48 rounded-full opacity-20"

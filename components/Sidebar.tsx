@@ -14,11 +14,13 @@ import {
   LogOut,
   User,
   BarChart2,
+  Network,
 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 
 const menuItems = [
   { icon: LayoutDashboard, label: 'Dashboard', href: '/' },
+  { icon: Network, label: 'Knowledge Graph', href: '/graph' },
   { icon: Search, label: 'Search', href: '/search' },
   { icon: FileUp, label: 'Upload', href: '/upload' },
   { icon: FileText, label: 'Notes', href: '/notes' },
