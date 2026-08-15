@@ -142,13 +142,17 @@ export default function KnowledgeGraph({ data, onSelectNote }: KnowledgeGraphPro
 
     // Build d3 force simulation
     const simulation = d3.forceSimulation<GraphNode>(nodes)
+      .alphaDecay(0.08)
       .force('link', d3.forceLink<GraphNode, GraphLink>(links)
         .id(d => d.id)
-        .distance(d => (d.dashed ? 120 : d.source === 'root' ? 140 : 80))
+        .distance(d => (d.dashed ? 110 : d.source === 'root' ? 130 : 75))
       )
-      .force('charge', d3.forceManyBody().strength(d => (d as GraphNode).type === 'root' ? -800 : -350))
-      .force('collide', d3.forceCollide<GraphNode>().radius(d => d.val + 14))
+      .force('charge', d3.forceManyBody().strength(d => (d as GraphNode).type === 'root' ? -600 : -250))
+      .force('collide', d3.forceCollide<GraphNode>().radius(d => d.val + 16))
       .force('center', d3.forceCenter(0, 0));
+
+    // Pre-warm 250 ticks so graph loads in a 100% settled, stationary state
+    simulation.tick(250);
 
     let animId: number;
     let pulseTime = 0;
@@ -343,8 +347,9 @@ export default function KnowledgeGraph({ data, onSelectNote }: KnowledgeGraphPro
 
     const onMouseUp = () => {
       if (isDraggingNodeRef.current && draggedNodeRef.current) {
-        draggedNodeRef.current.fx = null;
-        draggedNodeRef.current.fy = null;
+        // Keep node pinned at its dropped position to prevent bouncing
+        draggedNodeRef.current.fx = draggedNodeRef.current.x;
+        draggedNodeRef.current.fy = draggedNodeRef.current.y;
         draggedNodeRef.current = null;
         isDraggingNodeRef.current = false;
         simulation.alphaTarget(0);
