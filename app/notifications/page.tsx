@@ -27,6 +27,8 @@ export default function NotificationsPage() {
     refetchInterval: 30000,
   });
 
+  const [successMsg, setSuccessMsg] = useState<string | null>(null);
+
   const updateEmailMutation = useMutation({
     mutationFn: async (email: string) => {
       const response = await api.patch('/user/me/email', { email });
@@ -34,7 +36,8 @@ export default function NotificationsPage() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['user-profile'] });
-      alert('Email updated! Revision reminders will be sent here.');
+      setSuccessMsg('Email updated! Revision reminders will be sent here. ✨');
+      setTimeout(() => setSuccessMsg(null), 4500);
     },
   });
 
@@ -97,6 +100,16 @@ export default function NotificationsPage() {
           </button>
         )}
       </div>
+
+      {successMsg && (
+        <div
+          className="p-4 rounded-xl text-sm font-semibold flex items-center gap-3 border animate-fade-in"
+          style={{ background: '#f0fdf4', borderColor: '#bbf7d0', color: '#15803d' }}
+        >
+          <CheckCircle2 className="w-5 h-5 flex-shrink-0" />
+          <span>{successMsg}</span>
+        </div>
+      )}
 
       {/* Email Settings */}
       <div

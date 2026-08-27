@@ -112,6 +112,18 @@ export default function NotePage() {
       const email = recipientEmail.trim();
       const body: Record<string, string | number> = { note_id: noteId, email };
       if (delay.minutes != null) body.delay_minutes = delay.minutes;
+  // ── Toast notification state ─────────────────────────────────────────
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null);
+  const showToast = (message: string, type: 'success' | 'error' | 'info' = 'success') => {
+    setToast({ message, type });
+    setTimeout(() => setToast(null), 4500);
+  };
+
+  const scheduleMutation = useMutation({
+    mutationFn: async (delay: ScheduleDelay) => {
+      const email = recipientEmail.trim() || undefined;
+      const body: Record<string, any> = { note_id: noteId, email };
+      if (delay.minutes != null) body.delay_minutes = delay.minutes;
       else body.delay_hours = delay.hours ?? 1;
       if (noteReminder) {
         const params: Record<string, string | number> = { email };
@@ -128,26 +140,26 @@ export default function NotePage() {
       queryClient.invalidateQueries({ queryKey: ['reminders'] });
       queryClient.invalidateQueries({ queryKey: ['questions', id] });
       if (data.scheduled_question) setLastScheduledQuestion(data.scheduled_question);
-      alert(`Revision scheduled!\n\nQuestion generated for ${note?.topic || note?.title}.\nEmail will be sent to: ${data.email_to || recipientEmail}`);
+      showToast(`Revision scheduled! Email will be sent to: ${data.email_to || recipientEmail}`, 'success');
     },
-    onError: (err: Error) => { alert(err.message || 'Failed to schedule revision'); },
+    onError: (err: Error) => { showToast(err.message || 'Failed to schedule revision', 'error'); },
   });
 
   const completeReminderMutation = useMutation({
     mutationFn: async (reminderId: number) => { const response = await api.post(`/reminders/${reminderId}/complete`); return response.data; },
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['reminders'] }); setLastScheduledQuestion(null); alert('Revision marked complete!'); },
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['reminders'] }); setLastScheduledQuestion(null); showToast('Revision marked complete! ✨', 'success'); },
   });
 
   const retryMutation = useMutation({
     mutationFn: async () => { await notesService.retryNoteSummary(noteId); },
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['note', id] }); queryClient.invalidateQueries({ queryKey: ['questions', id] }); alert('AI processing retried!'); },
-    onError: (err: any) => { alert(err.message || 'Failed to retry AI processing'); },
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['note', id] }); queryClient.invalidateQueries({ queryKey: ['questions', id] }); showToast('AI processing retried successfully! ✨', 'success'); },
+    onError: (err: any) => { showToast(err.message || 'Failed to retry AI processing', 'error'); },
   });
 
   const deleteNoteMutation = useMutation({
     mutationFn: async () => { await notesService.deleteNote(noteId); },
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['notes'] }); router.push('/notes'); },
-    onError: (err: any) => { alert(err.message || 'Failed to delete note'); },
+    onError: (err: any) => { showToast(err.message || 'Failed to delete note', 'error'); },
   });
 
   if (isLoading) {
@@ -522,9 +534,27 @@ export default function NotePage() {
                 ))}
               </div>
             </div>
-          )}
         </div>
       </div>
+
+      {/* Modern Floating Toast Notification */}
+      {toast && (
+        <div
+          className="fixed bottom-6 right-6 z-50 flex items-center gap-3 px-5 py-3.5 rounded-2xl shadow-2xl transition-all border text-sm font-semibold text-white"
+          style={{
+            background: toast.type === 'error' ? '#ef4444' : toast.type === 'info' ? '#6366f1' : '#10b981',
+            borderColor: 'rgba(255, 255, 255, 0.25)',
+            boxShadow: '0 12px 32px rgba(0, 0, 0, 0.35)',
+            backdropFilter: 'blur(8px)',
+          }}
+        >
+          {toast.type === 'error' ? <AlertCircle className="w-5 h-5 flex-shrink-0" /> : <CheckCircle2 className="w-5 h-5 flex-shrink-0" />}
+          <span>{toast.message}</span>
+          <button onClick={() => setToast(null)} className="ml-2 text-white/80 hover:text-white font-bold text-xs p-1">
+            ✕
+          </button>
+        </div>
+      )}
     </div>
   );
 }
