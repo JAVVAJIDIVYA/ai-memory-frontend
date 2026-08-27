@@ -26,6 +26,7 @@ export default function NotePage() {
 
   // ── Edit state ──────────────────────────────────────────────────────────────
   const [isEditing, setIsEditing] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [editTitle, setEditTitle] = useState('');
   const [editSubject, setEditSubject] = useState('');
   const [editTopic, setEditTopic] = useState('');
@@ -215,15 +216,34 @@ export default function NotePage() {
                 Edit Note
               </button>
               {/* Delete button */}
-              <button
-                onClick={() => { if (confirm('Are you sure you want to delete this note?')) deleteNoteMutation.mutate(); }}
-                disabled={deleteNoteMutation.isPending}
-                className="flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold transition-all disabled:opacity-50 text-white text-sm"
-                style={{ background: 'linear-gradient(135deg, #ef4444, #dc2626)', boxShadow: '0 4px 12px rgba(239,68,68,0.3)' }}
-              >
-                {deleteNoteMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
-                Delete
-              </button>
+              {!showDeleteConfirm ? (
+                <button
+                  onClick={() => setShowDeleteConfirm(true)}
+                  disabled={deleteNoteMutation.isPending}
+                  className="flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold transition-all disabled:opacity-50 text-white text-sm"
+                  style={{ background: 'linear-gradient(135deg, #ef4444, #dc2626)', boxShadow: '0 4px 12px rgba(239,68,68,0.3)' }}
+                >
+                  <Trash2 className="w-4 h-4" />
+                  Delete
+                </button>
+              ) : (
+                <div className="flex items-center gap-2 bg-red-50 dark:bg-red-950/40 p-1.5 rounded-xl border border-red-200 dark:border-red-900">
+                  <span className="text-xs font-semibold text-red-600 dark:text-red-400 px-2">Delete note?</span>
+                  <button
+                    onClick={() => deleteNoteMutation.mutate()}
+                    disabled={deleteNoteMutation.isPending}
+                    className="px-3 py-1.5 rounded-lg text-xs font-bold text-white bg-red-600 hover:bg-red-700 transition-all"
+                  >
+                    {deleteNoteMutation.isPending ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : 'Yes, Delete'}
+                  </button>
+                  <button
+                    onClick={() => setShowDeleteConfirm(false)}
+                    className="px-2 py-1.5 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-900 dark:text-slate-300"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         )}

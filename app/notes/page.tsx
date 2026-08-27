@@ -241,6 +241,7 @@ export default function AllNotesPage() {
   });
 
   const [searchTerm, setSearchQuery] = React.useState('');
+  const [deletingNoteId, setDeletingNoteId] = useState<number | null>(null);
   const [showCreateNote, setShowCreateNote] = useState(false);
   const [noteTitle, setNoteTitle] = useState('');
   const [noteContent, setNoteContent] = useState('');
@@ -570,21 +571,47 @@ export default function AllNotesPage() {
                       <Pencil className="w-3.5 h-3.5" />
                     </button>
                     {/* Delete */}
-                    <button
-                      onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        if (confirm('Are you sure you want to delete this note?')) deleteNoteMutation.mutate(note.id);
-                      }}
-                      disabled={deleteNoteMutation.isPending}
-                      title="Delete note"
-                      className="w-8 h-8 rounded-lg flex items-center justify-center transition-all disabled:opacity-50"
-                      style={{ color: '#ef4444', background: '#fef2f2' }}
-                      onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = '#fee2e2'; }}
-                      onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = '#fef2f2'; }}
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </button>
+                    {deletingNoteId === note.id ? (
+                      <div className="flex items-center gap-1 bg-red-50 dark:bg-red-950/40 p-1 rounded-lg border border-red-200" onClick={(e) => e.stopPropagation()}>
+                        <button
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            deleteNoteMutation.mutate(note.id);
+                            setDeletingNoteId(null);
+                          }}
+                          className="px-2 py-1 rounded bg-red-600 text-white font-bold text-[10px]"
+                        >
+                          Delete
+                        </button>
+                        <button
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            setDeletingNoteId(null);
+                          }}
+                          className="px-1.5 py-1 text-slate-500 font-bold text-[10px]"
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    ) : (
+                      <button
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          setDeletingNoteId(note.id);
+                        }}
+                        disabled={deleteNoteMutation.isPending}
+                        title="Delete note"
+                        className="w-8 h-8 rounded-lg flex items-center justify-center transition-all disabled:opacity-50"
+                        style={{ color: '#ef4444', background: '#fef2f2' }}
+                        onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = '#fee2e2'; }}
+                        onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = '#fef2f2'; }}
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    )}
                   </div>
                 </div>
 
